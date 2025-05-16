@@ -38,7 +38,7 @@ A beautiful, modern web application for reading and studying the Holy Quran with
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/nur-e-hidayah.git
+git clone https://github.com/abdullah1854/nur-e-hidayah.git
 cd NurEHidayah
 ```
 
@@ -233,7 +233,7 @@ See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions.
 
 For questions, suggestions, or bug reports:
 - Create an issue on GitHub
-- Email: contact@nur-e-hidayah.com
+- Email: abdullah@aisavytech.com
 
 ---
 
