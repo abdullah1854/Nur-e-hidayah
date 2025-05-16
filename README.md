@@ -1,29 +1,28 @@
-# Nur-e-Hidayah
+# Nur-e-Hidayah - Web Application
 
-A comprehensive Quran mobile application built with React Native that provides complete Quranic text with translations, tafseer (commentary), and AI-powered search capabilities.
+A beautiful, modern web application for reading and studying the Holy Quran with translations, tafseer, and advanced search capabilities.
+
+![Nur-e-Hidayah](screenshot.png)
 
 ## Features
 
 - 📖 Complete Quran with Arabic text
 - 🌐 Multiple translations (English, Urdu)
 - 📚 Comprehensive Tafseer (Ibn Kathir, Jalalayn, Qurtubi, Muyassar)
-- 🔍 Advanced search functionality (keyword and semantic)
-- 🎵 Audio recitation by multiple renowned Qaris
-- 🔖 Bookmarking system
+- 🔍 Advanced search functionality
 - 🌙 Dark mode support
-- ⚙️ Customizable settings (font size, translations, reciters)
-- 📱 Offline access
+- ⚙️ Customizable settings (font size, translations)
+- 💾 Persistent bookmarks and reading position
+- 🎨 Beautiful, responsive design
 
-## Installation
+## Getting Started
 
 ### Prerequisites
 
 - Node.js (v18 or higher)
-- React Native development environment set up
-- iOS: Xcode and CocoaPods
-- Android: Android Studio and Android SDK
+- npm or yarn
 
-### Steps
+### Installation
 
 1. Clone the repository:
 ```bash
@@ -36,43 +35,34 @@ cd NurEHidayah
 npm install
 ```
 
-3. iOS setup:
-```bash
-cd ios
-pod install
-cd ..
-```
-
-4. Run the application:
-
-For iOS:
-```bash
-npm run ios
-```
-
-For Android:
-```bash
-npm run android
-```
-
-For Web:
+3. Start the development server:
 ```bash
 npm run web
 ```
 
-## Technologies Used
+The application will open automatically in your browser at http://localhost:3001
 
-- React Native
+### Building for Production
+
+To create a production build:
+
+```bash
+npm run build
+```
+
+The optimized files will be in the `web-build` directory.
+
+## Technology Stack
+
+- React Native Web
 - TypeScript
 - React Navigation
 - Axios for API calls
-- AsyncStorage for local storage
-- React Native Vector Icons
-- React Native Audio Recorder Player
+- CSS for styling
 
 ## API Integration
 
-The app integrates with multiple Quran APIs:
+This application uses the following APIs:
 
 - **Al Quran Cloud API**: For Quranic text and translations
 - **Quran Tafseer API**: For comprehensive tafseer data
@@ -83,44 +73,61 @@ The app integrates with multiple Quran APIs:
 NurEHidayah/
 ├── src/
 │   ├── components/
+│   │   └── web/
+│   │       └── WebLayout.tsx
 │   ├── screens/
-│   │   ├── HomeScreen.tsx
-│   │   ├── SearchScreen.tsx
-│   │   ├── ReadingScreen.tsx
-│   │   ├── TafseerScreen.tsx
-│   │   ├── BookmarksScreen.tsx
-│   │   └── SettingsScreen.tsx
+│   │   └── web/
+│   │       ├── WebHomeScreen.tsx
+│   │       ├── WebReadingScreen.tsx
+│   │       ├── WebSearchScreen.tsx
+│   │       ├── WebTafseerScreen.tsx
+│   │       └── WebSettingsScreen.tsx
 │   ├── services/
 │   │   └── quranAPI.ts
 │   ├── context/
 │   │   └── QuranContext.tsx
-│   ├── utils/
-│   └── constants/
-├── App.tsx
-├── package.json
-└── README.md
+│   └── styles/
+│       └── webStyles.css
+├── public/
+│   └── index.html
+├── App.web.tsx
+├── index.web.js
+├── webpack.config.js
+└── package.json
 ```
 
-## Future Enhancements
+## Features Overview
 
-- [ ] Implement AI-powered semantic search
-- [ ] Add word-by-word translation
-- [ ] Include prayer times integration
-- [ ] Add note-taking functionality
-- [ ] Implement social sharing features
-- [ ] Add more language translations
-- [ ] Include tajweed rules highlighting
-- [ ] Implement offline audio download
+### Beautiful Interface
+- Modern, clean design with careful attention to typography
+- Smooth animations and transitions
+- Responsive layout that works on all screen sizes
+
+### Reading Experience
+- Clear Arabic text with optimized fonts
+- Side-by-side translation display
+- Adjustable font sizes for comfortable reading
+- Dark mode for night reading
+
+### Navigation
+- Easy navigation between surahs
+- Quick jump to specific verses
+- Bookmark management
+- Continue reading from where you left off
+
+### Search
+- Fast keyword search across the entire Quran
+- Search in translations
+- Highlighted search results
+
+### Tafseer
+- Multiple tafseer options
+- Easy switching between different commentaries
+- Contextual access from any verse
 
 ## Contributing
 
-Contributions are welcome! Please follow these steps:
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
@@ -129,9 +136,8 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Acknowledgments
 
 - Al Quran Cloud API for providing comprehensive Quranic data
-- All the open-source libraries used in this project
 - The Muslim community for continuous support and feedback
 
 ## Contact
 
-For questions or suggestions, please reach out to [your.email@example.com](mailto:your.email@example.com)
+For questions or suggestions, please reach out to contact@nur-e-hidayah.com

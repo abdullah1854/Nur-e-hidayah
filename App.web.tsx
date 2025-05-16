@@ -1,135 +1,87 @@
-import React from 'react';
-import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import React, { useEffect, useState } from 'react';
+import { View, Text } from 'react-native';
 import { QuranProvider } from './src/context/QuranContext';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import HomeScreen from './src/screens/HomeScreen';
-import SearchScreen from './src/screens/SearchScreen';
-import ReadingScreen from './src/screens/ReadingScreen';
-import TafseerScreen from './src/screens/TafseerScreen';
-import SettingsScreen from './src/screens/SettingsScreen';
-import BookmarksScreen from './src/screens/BookmarksScreen';
-import Icon from './src/components/Icon.web';
+import WebLoginScreen from './src/screens/web/WebLoginScreen';
+import TestScreen from './src/screens/web/TestScreen';
+import WebHomeScreen from './src/screens/web/WebHomeScreen';
+import WebReadingScreen from './src/screens/web/WebReadingScreen';
+import WebSearchScreen from './src/screens/web/WebSearchScreen';
+import WebTafseerScreen from './src/screens/web/WebTafseerScreen';
+import WebSettingsScreen from './src/screens/web/WebSettingsScreen';
+import WebLayout from './src/components/web/WebLayout';
+//import './src/styles/webStyles.css';
 
 const Stack = createStackNavigator();
-const Tab = createBottomTabNavigator();
-
-const TabNavigator = () => {
-  return (
-    <Tab.Navigator
-      screenOptions={{
-        tabBarActiveTintColor: '#007AFF',
-        tabBarInactiveTintColor: 'gray',
-      }}>
-      <Tab.Screen
-        name="Home"
-        component={HomeScreen}
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="home" color={color} size={size} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Search"
-        component={SearchScreen}
-        options={{
-          title: 'Search',
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="search" color={color} size={size} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Bookmarks"
-        component={BookmarksScreen}
-        options={{
-          title: 'Bookmarks',
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="bookmark" color={color} size={size} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Settings"
-        component={SettingsScreen}
-        options={{
-          title: 'Settings',
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="settings" color={color} size={size} />
-          ),
-        }}
-      />
-    </Tab.Navigator>
-  );
-};
 
 const App = () => {
+  const [initialRoute, setInitialRoute] = useState('Login');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Check if user is already logged in
+    const checkAuth = async () => {
+      const authToken = localStorage.getItem('authToken');
+      if (authToken) {
+        try {
+          // Verify token with backend
+          const response = await fetch('https://your-domain.com/api/auth/verify.php', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${authToken}`,
+            },
+          });
+          
+          const data = await response.json();
+          if (data.success) {
+            setInitialRoute('Layout');
+          }
+        } catch (error) {
+          console.error('Auth check failed:', error);
+        }
+      }
+      setLoading(false);
+    };
+    
+    checkAuth();
+  }, []);
+
+  if (loading) {
+    return <View style={styles.loadingContainer} />;
+  }
   return (
     <View style={styles.container}>
-      <SafeAreaProvider>
-        <QuranProvider>
-          <NavigationContainer>
-            <Stack.Navigator
-              screenOptions={{
-                headerStyle: {
-                  backgroundColor: '#007AFF',
-                },
-                headerTintColor: '#fff',
-                headerTitleStyle: {
-                  fontWeight: 'bold',
-                },
-              }}>
-              <Stack.Screen
-                name="Main"
-                component={TabNavigator}
-                options={{ title: 'Nur-e-Hidayah' }}
-              />
-              <Stack.Screen
-                name="Reading"
-                component={ReadingScreen}
-                options={({ navigation }) => ({ 
-                  title: 'Reading',
-                  headerLeft: () => (
-                    <TouchableOpacity
-                      onPress={() => navigation.goBack()}
-                      style={{ marginLeft: 15 }}>
-                      <Text style={{ color: '#fff', fontSize: 18 }}>← Back</Text>
-                    </TouchableOpacity>
-                  ),
-                })}
-              />
-              <Stack.Screen
-                name="Tafseer"
-                component={TafseerScreen}
-                options={({ navigation }) => ({ 
-                  title: 'Tafseer',
-                  headerLeft: () => (
-                    <TouchableOpacity
-                      onPress={() => navigation.goBack()}
-                      style={{ marginLeft: 15 }}>
-                      <Text style={{ color: '#fff', fontSize: 18 }}>← Back</Text>
-                    </TouchableOpacity>
-                  ),
-                })}
-              />
-            </Stack.Navigator>
-          </NavigationContainer>
-        </QuranProvider>
-      </SafeAreaProvider>
+      <QuranProvider>
+        <NavigationContainer>
+          <Stack.Navigator
+            initialRouteName={initialRoute}
+            screenOptions={{
+              headerShown: false,
+            }}>
+            <Stack.Screen name="Login" component={WebLoginScreen} />
+            <Stack.Screen name="Layout" component={WebLayout} />
+            <Stack.Screen name="Home" component={WebHomeScreen} />
+            <Stack.Screen name="Reading" component={WebReadingScreen} />
+            <Stack.Screen name="Search" component={WebSearchScreen} />
+            <Stack.Screen name="Tafseer" component={WebTafseerScreen} />
+            <Stack.Screen name="Settings" component={WebSettingsScreen} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </QuranProvider>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
+const styles = {
   container: {
     flex: 1,
-    height: '100vh',
-    width: '100vw',
+    backgroundColor: '#f8f9fa',
   },
-});
+  loadingContainer: {
+    flex: 1,
+    backgroundColor: '#f8f9fa',
+  },
+};
 
 export default App;

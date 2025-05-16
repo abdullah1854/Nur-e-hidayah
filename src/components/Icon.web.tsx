@@ -26,14 +26,14 @@ const iconMap: { [key: string]: string } = {
 };
 
 const Icon: React.FC<IconProps> = ({ name, size = 24, color = '#000', style }) => {
+  const finalStyle = {
+    fontSize: size,
+    color: color,
+    ...(style || {})
+  };
+  
   return (
-    <span 
-      style={{
-        fontSize: size,
-        color: color,
-        ...style
-      }}
-    >
+    <span style={finalStyle}>
       {iconMap[name] || '❓'}
     </span>
   );

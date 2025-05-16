@@ -13,8 +13,14 @@ if (rootElement) {
   rootElement.innerHTML = '';
   
   const root = ReactDOM.createRoot(rootElement);
-  root.render(<App />);
-  console.log('App rendered successfully');
+  try {
+    root.render(<App />);
+    console.log('App rendered successfully');
+  } catch (error) {
+    console.error('Error rendering app:', error);
+    // Add error details to help debug
+    console.error('Stack trace:', error.stack);
+  }
 } else {
   console.error('Root element not found');
 }

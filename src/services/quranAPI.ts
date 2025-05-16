@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const BASE_URL = 'https://api.alquran.cloud/v1';
-const TAFSEER_API = 'https://quran-tafseer-api.herokuapp.com';
+const TAFSEER_API = 'https://api.qurancdn.com';
 
 export const QuranAPI = {
   // Get all surahs
@@ -61,10 +61,20 @@ export const QuranAPI = {
   // Get tafseer for an ayah
   getTafseer: async (surahNumber: number, ayahNumber: number, tafsirId: number = 1) => {
     try {
+      // Using alquran.cloud API for tafseer
       const response = await axios.get(
-        `${TAFSEER_API}/tafseer/${tafsirId}/${surahNumber}/${ayahNumber}`
+        `${BASE_URL}/ayah/${surahNumber}:${ayahNumber}/editions/en.sahih,ar.muyassar`
       );
-      return response.data;
+      
+      // Format the response to match expected format
+      const tafseerData = {
+        tafseer_id: tafsirId,
+        tafseer_name: tafsirId === 1 ? 'English - Sahih International' : 'Arabic - Muyassar',
+        ayah_number: ayahNumber,
+        text: tafsirId === 1 ? response.data.data[0].text : response.data.data[1].text
+      };
+      
+      return tafseerData;
     } catch (error) {
       console.error('Error fetching tafseer:', error);
       throw error;
@@ -85,10 +95,33 @@ export const QuranAPI = {
   // Get audio for ayah
   getAyahAudio: async (reference: string, reciter: string = 'ar.alafasy') => {
     try {
-      const response = await axios.get(`${BASE_URL}/ayah/${reference}/${reciter}`);
-      return response.data.data.audio;
+      // If the reciter is the old format, convert it
+      const reciterMap: { [key: string]: string } = {
+        'Abdul_Basit_Murattal_128kbps': 'ar.abdulbasitmurattal',
+        'Alafasy_128kbps': 'ar.alafasy',
+        'Husary_128kbps': 'ar.husary',
+        'Minshawy_Murattal_128kbps': 'ar.minshawi'
+      };
+      
+      const actualReciter = reciterMap[reciter] || reciter;
+      
+      console.log('Fetching audio for:', reference, 'with reciter:', actualReciter);
+      const response = await axios.get(`${BASE_URL}/ayah/${reference}/${actualReciter}`);
+      console.log('Audio API response:', response.data);
+      
+      if (response.data && response.data.data) {
+        const data = response.data.data;
+        // For audio editions, the response includes the audio URL
+        const audioUrl = data.audio || data.audioSecondary?.[0];
+        console.log('Available fields:', Object.keys(data));
+        console.log('Audio URL from response:', audioUrl);
+        return audioUrl;
+      }
+      
+      return null;
     } catch (error) {
       console.error('Error fetching audio:', error);
+      // If not found, we might need to check available audio editions
       throw error;
     }
   },

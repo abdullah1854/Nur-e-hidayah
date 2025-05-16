@@ -32,10 +32,10 @@ const SettingsScreen = () => {
   ];
 
   const reciters = [
-    { id: 'Abdul_Basit_Murattal_128kbps', name: 'Abdul Basit' },
-    { id: 'Alafasy_128kbps', name: 'Mishary Alafasy' },
-    { id: 'Husary_128kbps', name: 'Mahmoud Khalil Al-Husary' },
-    { id: 'Minshawy_Murattal_128kbps', name: 'Mohamed Siddiq El-Minshawi' },
+    { id: 'ar.abdulbasitmurattal', name: 'Abdul Basit' },
+    { id: 'ar.alafasy', name: 'Mishary Alafasy' },
+    { id: 'ar.husary', name: 'Mahmoud Khalil Al-Husary' },
+    { id: 'ar.minshawi', name: 'Mohamed Siddiq El-Minshawi' },
   ];
 
   return (
