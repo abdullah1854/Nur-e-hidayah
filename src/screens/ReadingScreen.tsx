@@ -132,7 +132,9 @@ const ReadingScreen = () => {
     // For all surahs EXCEPT Al-Fatiha (1) and At-Tawbah (9), remove Bismillah from first verse
     if (surahNumber !== 1 && surahNumber !== 9 && ayah.numberInSurah === 1) {
       // Remove the Bismillah part from the first verse text to prevent duplication
-      displayText = displayText.replace('بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ', '').trim();
+      // Handle cases where Bismillah is combined with other text like in Surah 2
+      const bismillahRegex = /^بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ|^بِسۡمِ ٱللَّهِ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ/;
+      displayText = displayText.replace(bismillahRegex, '').trim();
     }
 
     return (
