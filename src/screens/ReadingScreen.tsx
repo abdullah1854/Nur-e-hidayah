@@ -126,6 +126,14 @@ const ReadingScreen = () => {
       (b) => b.surah === surahNumber && b.ayah === ayah.numberInSurah
     );
     const translationAyah = translation?.ayahs[index];
+    
+    // For Surah Al-Fatiha (1), we need to handle the first ayah specially
+    // because the API includes Bismillah in the first ayah text
+    let displayText = ayah.text;
+    if (surahNumber === 1 && ayah.numberInSurah === 1) {
+      // Remove the Bismillah part from the first verse text to prevent duplication
+      displayText = displayText.replace('بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ', '').trim();
+    }
 
     return (
       <View key={ayah.number} style={styles.ayahContainer}>
@@ -172,7 +180,7 @@ const ReadingScreen = () => {
             { fontSize: fontSize + 8 },
             isDarkMode && styles.darkText,
           ]}>
-          {ayah.text}
+          {displayText}
         </Text>
         {showTranslation && translationAyah && (
           <Text
