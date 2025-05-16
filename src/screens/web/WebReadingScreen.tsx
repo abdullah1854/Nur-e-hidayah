@@ -11,6 +11,7 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 import { useQuran } from '../../context/QuranContext';
 import { QuranAPI } from '../../services/quranAPI';
 import WebLayout from '../../components/web/WebLayout';
+import AudioWithFallback from '../../components/web/AudioWithFallback';
 
 interface Ayah {
   number: number;
@@ -50,6 +51,8 @@ const WebReadingScreen = () => {
   const [selectedAyah, setSelectedAyah] = useState<number | null>(null);
   const [playingAyah, setPlayingAyah] = useState<number | null>(null);
   const [audioPlayer, setAudioPlayer] = useState<HTMLAudioElement | null>(null);
+  const [surahAudioUrls, setSurahAudioUrls] = useState<string[]>([]);
+  const [showSurahAudio, setShowSurahAudio] = useState(false);
   
   const { surahNumber, ayahNumber } = route.params || { surahNumber: 1, ayahNumber: 1 };
 
@@ -75,6 +78,30 @@ const WebReadingScreen = () => {
       ]);
       setSurah(arabicData);
       setTranslation(translationData);
+      
+      // Generate multiple audio URLs for fallback
+      const audioUrls: string[] = [];
+      const paddedSurahNumber = String(surahNumber).padStart(3, '0');
+      
+      // Primary reciter URLs
+      audioUrls.push(
+        // download.quranicaudio.com pattern
+        `https://download.quranicaudio.com/quran/Alafasy_128kbps/${paddedSurahNumber}.mp3`,
+        // cdn.islamic.network pattern
+        `https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/${paddedSurahNumber}.mp3`,
+        // verses.quran.com pattern
+        `https://verses.quran.com/Alafasy_128kbps/${paddedSurahNumber}.mp3`,
+        // Alternative reciters
+        `https://download.quranicaudio.com/quran/Husary_128kbps/${paddedSurahNumber}.mp3`,
+        `https://download.quranicaudio.com/quran/Abdul_Basit_Murattal_128kbps/${paddedSurahNumber}.mp3`,
+        // Alternative CDN patterns
+        `https://everyayah.com/data/Alafasy_128kbps/${paddedSurahNumber}.mp3`,
+        `https://server8.mp3quran.net/afs/${paddedSurahNumber}.mp3`
+      );
+      
+      console.log('Generated audio URLs:', audioUrls);
+      setSurahAudioUrls(audioUrls);
+      
     } catch (error) {
       console.error('Error loading surah:', error);
     } finally {
@@ -270,11 +297,32 @@ const WebReadingScreen = () => {
                 Translation
               </Text>
             </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setShowSurahAudio(!showSurahAudio)}
+              style={[styles.controlButton]}>
+              <Text style={styles.controlIcon}>
+                {showSurahAudio ? '🔊' : '🔇'}
+              </Text>
+              <Text style={[styles.controlText, isDarkMode && styles.darkText]}>
+                Surah Audio
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
 
         {/* Ayahs */}
         <ScrollView style={styles.content}>
+          {/* Show Surah Audio Player */}
+          {showSurahAudio && (
+            <View style={styles.audioPlayerContainer}>
+              <AudioWithFallback 
+                surahNumber={surahNumber}
+                reciter={selectedReciter}
+                onComplete={() => console.log('Surah audio finished')}
+              />
+            </View>
+          )}
+          
           {/* Show Basmala for all surahs except 1 (Al-Fatihah) and 9 (At-Tawbah) */}
           {surahNumber !== 1 && surahNumber !== 9 && (
             <View style={styles.bismillah}>
@@ -438,6 +486,9 @@ const styles = {
   translationText: {
     lineHeight: 28,
     color: '#666',
+  },
+  audioPlayerContainer: {
+    marginBottom: 24,
   },
 };
 

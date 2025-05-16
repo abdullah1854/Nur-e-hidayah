@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        .test { margin: 20px 0; padding: 10px; border: 1px solid #ccc; }
+        .error { color: red; }
+        .success { color: green; }
+    </style>
+</head>
+<body>
+    <h1>Quran API Tests</h1>
+    
+    <div id="results"></div>
+    
+    <script>
+        const results = document.getElementById('results');
+        
+        function log(message, isError = false) {
+            const div = document.createElement('div');
+            div.className = isError ? 'error' : 'success';
+            div.textContent = message;
+            results.appendChild(div);
+        }
+        
+        async function testTafseerAPI() {
+            log('Testing Tafseer APIs...');
+            
+            // Test spa5k API
+            try {
+                const response = await fetch('https://quran-tafsir.api.spa5k.com/tafsirs');
+                const data = await response.json();
+                log(`spa5k API: Found ${data.tafsirs?.length || 0} tafsirs`);
+                console.log('spa5k tafsirs:', data.tafsirs);
+            } catch (e) {
+                log(`spa5k API Error: ${e.message}`, true);
+            }
+            
+            // Test specific tafseer
+            try {
+                const response = await fetch('https://quran-tafsir.api.spa5k.com/tafsirs/en-tafisr-ibn-kathir/ayat/1:1');
+                const data = await response.json();
+                log(`Ibn Kathir tafseer test: ${data.text ? 'Success' : 'Failed'}`);
+                console.log('Ibn Kathir response:', data);
+            } catch (e) {
+                log(`Ibn Kathir Error: ${e.message}`, true);
+            }
+            
+            // Test secondary API
+            try {
+                const response = await fetch('https://api.quran-tafseer.com/tafseer/1/1/1');
+                const data = await response.json();
+                log(`Secondary API test: ${data.text ? 'Success' : 'Failed'}`);
+                console.log('Secondary API response:', data);
+            } catch (e) {
+                log(`Secondary API Error: ${e.message}`, true);
+            }
+            
+            // Test alquran.cloud
+            try {
+                const response = await fetch('https://api.alquran.cloud/v1/ayah/1:1/en.sahih');
+                const data = await response.json();
+                log(`alquran.cloud test: ${data.data?.text ? 'Success' : 'Failed'}`);
+                console.log('alquran.cloud response:', data);
+            } catch (e) {
+                log(`alquran.cloud Error: ${e.message}`, true);
+            }
+        }
+        
+        async function testAudioCDNs() {
+            log('\nTesting Audio CDNs...');
+            
+            const surahNumber = '001';
+            const cdns = [
+                `https://download.quranicaudio.com/quran/Alafasy_128kbps/${surahNumber}.mp3`,
+                `https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/${surahNumber}.mp3`,
+                `https://download.quranicaudio.com/qdc/mishari_al_afasy/murattal/${surahNumber}.mp3`,
+                `https://everyayah.com/data/Alafasy_128kbps/${surahNumber}.mp3`,
+                `https://server8.mp3quran.net/afs/${surahNumber}.mp3`
+            ];
+            
+            for (const url of cdns) {
+                try {
+                    const audio = new Audio(url);
+                    await new Promise((resolve, reject) => {
+                        audio.addEventListener('canplay', () => resolve());
+                        audio.addEventListener('error', () => reject(new Error('Failed to load')));
+                        setTimeout(() => reject(new Error('Timeout')), 5000);
+                    });
+                    log(`✓ Audio CDN working: ${url}`);
+                } catch (e) {
+                    log(`✗ Audio CDN failed: ${url}`, true);
+                }
+            }
+        }
+        
+        // Run tests
+        (async () => {
+            await testTafseerAPI();
+            await testAudioCDNs();
+        })();
+    </script>
+</body>
+</html>

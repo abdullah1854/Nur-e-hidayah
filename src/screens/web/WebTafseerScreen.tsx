@@ -18,11 +18,6 @@ interface TafseerData {
   text: string;
 }
 
-const TAFSEER_OPTIONS = [
-  { id: 1, name: 'English - Sahih International' },
-  { id: 2, name: 'Arabic - Muyassar' },
-];
-
 const WebTafseerScreen = () => {
   const route = useRoute();
   const navigation = useNavigation();
@@ -31,7 +26,40 @@ const WebTafseerScreen = () => {
   
   const [tafseerData, setTafseerData] = useState<TafseerData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedTafseer, setSelectedTafseer] = useState(1);
+  const [selectedTafseer, setSelectedTafseer] = useState<string | number>('en-tafisr-ibn-kathir');
+  const [tafseerOptions, setTafseerOptions] = useState([
+    { id: 'en-tafisr-ibn-kathir', name: 'Ibn Kathir (English)' },
+    { id: 'ar-tafsir-ibn-kathir', name: 'Ibn Kathir (Arabic)' },
+    { id: 'ur-tafseer-ibn-kaseer', name: 'Ibn Kathir (Urdu)' },
+    { id: 'en-tafsir-saadi', name: 'Tafsir As-Sa\'di (English)' },
+    { id: 1, name: 'English - Sahih International' },
+    { id: 2, name: 'Arabic - Taiseer' },
+    { id: 3, name: 'Urdu - Ahmed Ali' },
+    { id: 4, name: 'Hindi Translation' },
+  ]);
+
+  useEffect(() => {
+    loadAvailableTafseers();
+  }, []);
+
+  const loadAvailableTafseers = async () => {
+    try {
+      const availableTafseers = await QuranAPI.getAvailableTafseers();
+      if (Array.isArray(availableTafseers) && availableTafseers.length > 0) {
+        // Filter and format tafseers focusing on Urdu/Hindi
+        const formattedTafseers = availableTafseers
+          .filter(t => ['en', 'ar', 'ur', 'hi'].includes(t.language))
+          .map(t => ({
+            id: t.id,
+            name: t.name || t.tafseer_name,
+          }));
+        setTafseerOptions(formattedTafseers);
+      }
+    } catch (error) {
+      console.error('Error loading tafseers:', error);
+      // Keep default options
+    }
+  };
 
   useEffect(() => {
     loadTafseer();
@@ -40,10 +68,26 @@ const WebTafseerScreen = () => {
   const loadTafseer = async () => {
     setLoading(true);
     try {
+      console.log(`Loading tafseer for Surah ${surahNumber}, Ayah ${ayahNumber}, Tafseer ID: ${selectedTafseer}`);
       const data = await QuranAPI.getTafseer(surahNumber, ayahNumber, selectedTafseer);
+      console.log('Tafseer data received:', data);
       setTafseerData(data);
     } catch (error) {
       console.error('Error loading tafseer:', error);
+      console.error('Error details:', {
+        surahNumber,
+        ayahNumber,
+        selectedTafseer,
+        errorMessage: error.message,
+        errorStack: error.stack
+      });
+      // Set error state
+      setTafseerData({
+        tafseer_id: selectedTafseer,
+        tafseer_name: 'Error',
+        ayah_number: ayahNumber,
+        text: 'Failed to load tafseer. Please try a different tafseer or check your internet connection.'
+      });
     } finally {
       setLoading(false);
     }
@@ -90,24 +134,26 @@ const WebTafseerScreen = () => {
 
         {/* Tafseer Selection */}
         <View style={[styles.tafseerSelector, isDarkMode && styles.darkSelector]}>
-          {TAFSEER_OPTIONS.map((option) => (
-            <TouchableOpacity
-              key={option.id}
-              style={[
-                styles.tafseerOption,
-                selectedTafseer === option.id && styles.selectedOption,
-              ]}
-              onPress={() => setSelectedTafseer(option.id)}>
-              <Text
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {tafseerOptions.map((option) => (
+              <TouchableOpacity
+                key={option.id}
                 style={[
-                  styles.optionText,
-                  selectedTafseer === option.id && styles.selectedOptionText,
-                  isDarkMode && styles.darkText,
-                ]}>
-                {option.name}
-              </Text>
-            </TouchableOpacity>
-          ))}
+                  styles.tafseerOption,
+                  selectedTafseer === option.id && styles.selectedOption,
+                ]}
+                onPress={() => setSelectedTafseer(option.id)}>
+                <Text
+                  style={[
+                    styles.optionText,
+                    selectedTafseer === option.id && styles.selectedOptionText,
+                    isDarkMode && styles.darkText,
+                  ]}>
+                  {option.name}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
         </View>
 
         {/* Tafseer Content */}
