@@ -147,10 +147,10 @@ const WebReadingScreen = () => {
     const translationAyah = translation?.ayahs[index];
     const isSelected = selectedAyah === ayah.numberInSurah;
     
-    // For Surah Al-Fatiha (1), we need to handle the first ayah specially
-    // because the API includes Bismillah in the first ayah text
+    // Handle Bismillah duplication
     let displayText = ayah.text;
-    if (surahNumber === 1 && ayah.numberInSurah === 1) {
+    // For all surahs EXCEPT Al-Fatiha (1) and At-Tawbah (9), remove Bismillah from first verse
+    if (surahNumber !== 1 && surahNumber !== 9 && ayah.numberInSurah === 1) {
       // Remove the Bismillah part from the first verse text to prevent duplication
       displayText = displayText.replace('بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ', '').trim();
     }
